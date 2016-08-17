@@ -1,54 +1,137 @@
 
 body {
-  margin: 0 !important;
-  font-family: 'Lato', sans-serif;
-  background-color: #356095;
+  font-family: 'Asap', Arial;
+  background: linear-gradient(245deg, #a24bcf, #4a78cf, #4bc5cf);
+  background-size: 600% 600%;
+  -webkit-animation: backgroundGrandient 46s ease infinite;
+  -moz-animation: backgroundGrandient 46s ease infinite;
+  animation: backgroundGrandient 46s ease infinite;
 }
 
-#aboutme {
-  width: 100%;
-  height: 100%;
-  margin-top: -45px;
+@-webkit-keyframes backgroundGrandient {
+    0%{background-position:0% 25%}
+    50%{background-position:100% 25%}
+    100%{background-position:0% 75%}
+}
+@-moz-keyframes backgroundGrandient {
+    0%{background-position:0% 75%}
+    50%{background-position:100% 25%}
+    100%{background-position:0% 75%}
+}
+@keyframes backgroundGrandient {
+    0%{background-position:0% 75%}
+    50%{background-position:100% 25%}
+    100%{background-position:0% 75%}
 }
 
-#details {
+h1 {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: bold;
+  margin: 10px 0px;
+}
+
+#about {
+  width: 500px;
+  height: 50%;
+  padding: 30px 20px;
+  background-color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  position: absolute;
+  margin: auto;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  border-radius: 15px;
+}
+
+#about p {
+  color: white;
+  font-size: 1.1em;
+  font-weight: lighter;
+  width: 220px;
+  margin: 15px auto 20px auto;
+}
+
+#about div {
+  display: block;
+}
+
+#about div.off {
   display: none;
-  position: fixed;
-  bottom: 50px;
-  right: 5px;
-  width: 300px;
+}
+
+#about ul {
+  padding: 0px;
+  margin: 0px;
+  list-style-type: none;
+}
+
+#about li {
+  display: inline-block;
+  padding: 8px;
+}
+
+#about li img {
+  opacity: 1;
+  width: 60px;
+  border-radius: 50%;
+}
+
+#about ul.second {
+  max-width: 240px;
+  margin: 5px auto;
+}
+
+#about ul.second li {
+  padding: 3px;
+}
+
+#about ul.second li img {
+  width: 35px;
+}
+
+#about button {
+  background: none;
+  border: 1px solid white;
   border-radius: 5px;
   color: white;
-  background-color: rgba(53, 96, 149, 0.5);
-  margin: 10px;
-  padding: 20px;
+  padding: 8px;
+  font-size: 1em;
 }
 
-#buttontab {
-  position: fixed;
-  background-color: #356095;
-  height: 45px;
-  max-height: 45px;
-  width: 100%;
-  bottom: 0px;
+img.bnw {
+  filter: grayscale(100%);
+	-webkit-filter: grayscale(100%);
 }
 
-#buttontab ul {
-  list-style-type: none;
-  margin: 0px 55px;
-  float: right;
+img.off {
+  opacity: 0.5 !important;
 }
 
-#buttontab li {
-  float: left;
-  margin: 13px 25px;
+@media only screen and (max-height: 500px) {
+  #about {
+    height: 70% !important;
+  }
 }
 
-#buttontab a {
-  color: #accee7;
-  text-decoration: none;
+@media only screen and (max-height: 600px) {
+  #about {
+    height: 60%;
+  }
 }
 
-#buttontab a:hover {
-  color: white;
+@media only screen and (max-width: 715px) {
+  h1 {
+    font-size: 1.91em !important;
+  }
+  #about {
+    width: 70% !important;
+  }
+  #about li {
+    padding: 5px;
+  }
+  #about ul.second li img {
+    width: 33px;
+  }
 }
