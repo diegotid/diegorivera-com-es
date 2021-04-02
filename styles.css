@@ -25,6 +25,10 @@ body {
   margin-top: 10px;
 }
 
+a {
+  color: greenyellow;
+}
+
 input {
   width: 100%;
   background: none;

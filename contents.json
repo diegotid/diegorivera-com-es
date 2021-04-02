@@ -1,4 +1,74 @@
 {
-    "family": {},
-    "work": {}
+    "data": {
+        "date": "1974-06-10"
+    },
+    "childs": {
+        "do": {
+            "data": {
+                "date": "1999-04-26"
+            },
+            "childs": {
+                "archive": {
+                    "data": {
+                        "date": "2011-07-19"
+                    },
+                    "childs": {
+                        "BlackBerry World": {
+                            "data": {
+                                "date": "2011-07-19",
+                                "link": "https://appworld.blackberry.com/webstore/vendor/4680"
+                            }
+                        }
+                    }
+                },
+                "LinkedIn": {
+                    "data": {
+                        "date": "2008-04-03",
+                        "link": "https://www.linkedin.com/in/diegorivera/"
+                    }                
+                },
+                "GitHub": {
+                    "data": {
+                        "date": "2011-07-19",
+                        "link": "https://github.com/diegotid"
+                    }                
+                }
+            }
+        },
+        "like": {
+            "data": {
+                "date": "1988-10-01"
+            },
+            "childs": {
+                "Twitter": {
+                    "data": {
+                        "date": "2009-11-20",
+                        "link": "http://twitter.com/notthefamous"
+                    }
+                }
+            }
+        },
+        "love": {
+            "data": {
+                "date": "1999-04-25"
+            },
+            "childs": {
+                "Darío": {
+                    "data": {
+                        "date": "2006-06-03"
+                    }                
+                },
+                "Mateo": {
+                    "data": {
+                        "date": "2006-06-03"
+                    }                
+                },
+                "Sonia": {
+                    "data": {
+                        "date": "1999-04-25"
+                    }                
+                }
+            }
+        }
+    }
 }
