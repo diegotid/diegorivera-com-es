@@ -1,2 +1,4 @@
 .DS_Store
 *.codekit3
+*-min.js
+*-min.css

@@ -1,1 +1,0 @@
-function getPrompt(){var e=document.createElement("div"),t=document.createElement("label"),n=document.createElement("input");return e.classList.add("prompt"),t.textContent="$",n.setAttribute("autofocus",!0),e.appendChild(t),e.appendChild(n),e}window.onload=()=>{document.querySelector("#terminal").appendChild(getPrompt())};
