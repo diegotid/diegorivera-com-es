@@ -7,6 +7,12 @@
  * Shell terminal functions
  */
 
+var path = [];
+var user = "guest";
+var historyPointer = 0;
+var historyCommands = [];
+var currentCommand = "";
+
 window.onload = () => {
 
     showPrompt();
@@ -14,23 +20,54 @@ window.onload = () => {
 
 document.addEventListener("keyup", event => {
 
-    if (event.key === 'Enter') {
-        let entries = document.querySelectorAll('input');
-        let prompt = [].slice.call(entries).pop();
-        prompt.readOnly = true;
-        var arguments = prompt.value;
-        console.log(arguments);
-        arguments = arguments.split(" ");
-        let command = arguments.shift();
-        if (!!window[command]) {
-            window[command](arguments);
-        } else {
-            let resultRow = getDisplay();
-            resultRow.textContent = "command not found: " + command;
-            showPrompt();
-        }
+    let entries = document.querySelectorAll('input');
+    let prompt = [].slice.call(entries).pop();
+    switch (event.key) {
+        case 'Enter':
+            prompt.readOnly = true;
+            prompt.onblur = null;
+            var arguments = prompt.value;
+            arguments = arguments.split(" ");
+            let command = arguments.shift();
+            if (!command) {
+                showPrompt();
+            } else if (!!window[command]) {
+                historyCommands.push(prompt.value);
+                window[command](arguments);
+            } else {
+                let resultRow = getDisplay();
+                resultRow.textContent = "command not found: " + command;
+                showPrompt();
+            }
+            historyPointer = 0;
+            currentCommand = "";
+            break;
+        case 'ArrowUp':
+            if (historyPointer < historyCommands.length) {
+                historyPointer++;
+                prompt.value = historyCommands[historyCommands.length - historyPointer];
+            }
+            break;
+        case 'ArrowDown':
+            if (historyPointer > 0) {
+                historyPointer--;
+                if (historyPointer == 0) {
+                    prompt.value = currentCommand;
+                } else {
+                    prompt.value = historyCommands[historyCommands.length - historyPointer];
+                }
+            }
+            break;
+        default:
+            currentCommand = prompt.value;
+            break;
     }
 })
+
+function getPath() {
+
+    return user + ":~" + (path.length > 0 ? "/"  : "") + path.join("/");
+}
 
 function showPrompt() {
 
@@ -38,11 +75,14 @@ function showPrompt() {
     var promptLabel = document.createElement('label');
     var promptInput = document.createElement('input');
     promptRow.classList.add('prompt')
-    promptLabel.textContent = '$';
+    promptLabel.textContent = getPath() + '$';
     promptRow.appendChild(promptLabel);
     promptRow.appendChild(promptInput);
     document.querySelector('#terminal').appendChild(promptRow);
     promptInput.focus();
+    promptInput.onblur = () => {
+        promptInput.focus();
+    }
 
     return promptRow;
 }
@@ -61,7 +101,27 @@ function ls(args) {
         .then(response => response.json())
         .then(contents => {
             let resultRow = getDisplay();
-            resultRow.textContent = Object.keys(contents).join(" ");
+            resultRow.innerHTML = Object.keys(contents).join("&emsp;");
+            showPrompt();
+        });
+}
+
+function cd(args) {
+
+    fetch('contents.json')
+        .then(response => response.json())
+        .then(contents => {
+            let dir = args[0];
+            if (dir != '.') {
+                if (dir == '..') {
+                    path.pop();
+                } else if (Object.keys(contents).includes(dir)) {
+                    path.push(dir);
+                } else {
+                    let resultRow = getDisplay();
+                    resultRow.innerHTML = "no such file or directory: " + dir;
+                }
+            }
             showPrompt();
         });
 }
