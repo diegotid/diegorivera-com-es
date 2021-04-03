@@ -9,12 +9,14 @@
 
 /**
  * TO-DO
- * - ls <dir>
- * - cd ../<dir>
+ * - cd
+ * - cd ~
+ * - ls -la
  * - cd no such directory as 404 page (eg, http://diegorivera.com.es/drappstudio)
+ * - su <user>
  */
 
-var path = [];
+var currentPath = [];
 var user = "guest";
 var historyPointer = 0;
 var historyCommands = [];
@@ -25,7 +27,7 @@ window.onload = () => {
     showPrompt();
 }
 
-document.addEventListener("keyup", event => {
+document.addEventListener("keyup", async (event) => {
 
     let entries = document.querySelectorAll('input');
     let prompt = [].slice.call(entries).pop();
@@ -34,35 +36,29 @@ document.addEventListener("keyup", event => {
             prompt.readOnly = true;
             prompt.onblur = null;
             var arguments = prompt.value.replace(/^(\.\/)/,"");;
-            fetch('contents.json')
-            .then(response => response.json())
-            .then(contents => {
-                path.forEach(dir => {
-                    contents = contents.childs[dir];
-                })
-                for (const entry in contents.childs) {
-                    if (entry.toLowerCase() == arguments.toLowerCase().trim()) {
-                        let content = contents.childs[entry];
-                        if (!!content.data.link) {
-                            window.open(content.data.link, "_blank");
-                            openLink(entry);
-                            return;
-                        }
+
+            var contents = await getCurentPathContents();
+            for (const entry in contents.childs) {
+                if (entry.toLowerCase() == arguments.toLowerCase().trim()) {
+                    let content = contents.childs[entry];
+                    if (!!content.data.link) {
+                        window.open(content.data.link, "_blank");
+                        openLink(entry);
+                        return;
                     }
                 }
-                arguments = arguments.split(" ");
-                let command = arguments.shift();
-                if (!command) {
-                    showPrompt();
-                } else if (!!window[command]) {
-                    historyCommands.push(prompt.value);
-                    window[command](arguments);
-                } else {
-                    let resultRow = getDisplay();
-                    resultRow.textContent = "command not found: " + command;
-                    showPrompt();
-                }
-            })
+            }
+            arguments = arguments.split(" ");
+            let command = arguments.shift();
+            if (!command) {
+                showPrompt();
+            } else if (!!window[command]) {
+                historyCommands.push(prompt.value);
+                window[command](arguments);
+            } else {
+                showDisplay("command not found: " + command);
+                showPrompt();
+            }
             historyPointer = 0;
             currentCommand = "";
             break;
@@ -88,9 +84,48 @@ document.addEventListener("keyup", event => {
     }
 })
 
+function getCurentPathContents() {
+
+    return new Promise(resolve => {
+        fetch('contents.json')
+        .then(response => response.json())
+        .then(contents => {
+            for (const i in currentPath) {
+                let dir = currentPath[i];
+                contents = contents.childs[dir];
+            }
+            resolve(contents);
+        })
+    });
+}
+
 function getPath() {
 
-    return user + ":~" + (path.length > 0 ? "/"  : "") + path.join("/");
+    return user + ":~" + (currentPath.length > 0 ? "/"  : "") + currentPath.join("/");
+}
+
+async function changeDir(to) {
+
+    var contents = await getCurentPathContents();
+    let path = to.split("/");
+    for (const i in path) {
+        let dir = path[i];
+        if (dir != '.') {
+            if (dir == '..') {
+                currentPath.pop();
+                contents = await getCurentPathContents();
+            } else if (Object.keys(contents.childs).includes(dir)) {
+                if (Object.keys(contents.childs[dir]).includes("childs")) {
+                    currentPath.push(dir);
+                    contents = contents.childs[dir];
+                } else {
+                    throw "not a directory: " + dir;
+                }
+            } else {
+                throw "no such file or directory: " + dir;
+            }
+        }
+    }
 }
 
 function showPrompt() {
@@ -111,36 +146,11 @@ function showPrompt() {
     return promptRow;
 }
 
-function getDisplay() {
+function showDisplay(content) {
 
     var resultRow = document.createElement('div');
     document.querySelector('#terminal').appendChild(resultRow);
-
-    return resultRow;
-}
-
-function ls(args) {
-
-    fetch('contents.json')
-        .then(response => response.json())
-        .then(contents => {
-            path.forEach(dir => {
-                contents = contents.childs[dir];
-            })
-            let resultRow = getDisplay();
-            let date = new Date(contents.data.date);
-            resultRow.innerHTML = "total " + Object.keys(contents.childs).length + "<br/>";
-            resultRow.innerHTML += lsLine(".", contents);
-            resultRow.innerHTML += lsLine("..", contents);
-            Object.keys(contents.childs).forEach(child => {
-                try {
-                    resultRow.innerHTML += lsLine(child, contents.childs[child]);
-                } catch (e) {
-                    console.log(e)
-                }
-            })
-            showPrompt();
-        });
+    resultRow.innerHTML = content;
 }
 
 function lsLine(name, content) {
@@ -172,31 +182,7 @@ function onFollowLink(entry) {
 
 function openLink(entry) {
 
-    let resultRow = getDisplay();
-    resultRow.textContent = "opening '" + entry + "' in the web browser...";
     historyCommands.push("./" + entry);
+    showDisplay("opening '" + entry + "' in the web browser...");
     showPrompt();
-}
-
-function cd(args) {
-
-    fetch('contents.json')
-        .then(response => response.json())
-        .then(contents => {
-            path.forEach(dir => {
-                contents = contents.childs[dir];
-            })
-            let dir = args[0];
-            if (dir != '.') {
-                if (dir == '..') {
-                    path.pop();
-                } else if (Object.keys(contents.childs).includes(dir)) {
-                    path.push(dir);
-                } else {
-                    let resultRow = getDisplay();
-                    resultRow.innerHTML = "no such file or directory: " + dir;
-                }
-            }
-            showPrompt();
-        });
 }
