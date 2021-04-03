@@ -33,19 +33,36 @@ document.addEventListener("keyup", event => {
         case 'Enter':
             prompt.readOnly = true;
             prompt.onblur = null;
-            var arguments = prompt.value;
-            arguments = arguments.split(" ");
-            let command = arguments.shift();
-            if (!command) {
-                showPrompt();
-            } else if (!!window[command]) {
-                historyCommands.push(prompt.value);
-                window[command](arguments);
-            } else {
-                let resultRow = getDisplay();
-                resultRow.textContent = "command not found: " + command;
-                showPrompt();
-            }
+            var arguments = prompt.value.replace(/^(\.\/)/,"");;
+            fetch('contents.json')
+            .then(response => response.json())
+            .then(contents => {
+                path.forEach(dir => {
+                    contents = contents.childs[dir];
+                })
+                for (const entry in contents.childs) {
+                    if (entry.toLowerCase() == arguments.toLowerCase().trim()) {
+                        let content = contents.childs[entry];
+                        if (!!content.data.link) {
+                            window.open(content.data.link, "_blank");
+                            openLink(entry);
+                            return;
+                        }
+                    }
+                }
+                arguments = arguments.split(" ");
+                let command = arguments.shift();
+                if (!command) {
+                    showPrompt();
+                } else if (!!window[command]) {
+                    historyCommands.push(prompt.value);
+                    window[command](arguments);
+                } else {
+                    let resultRow = getDisplay();
+                    resultRow.textContent = "command not found: " + command;
+                    showPrompt();
+                }
+            })
             historyPointer = 0;
             currentCommand = "";
             break;
@@ -135,10 +152,30 @@ function lsLine(name, content) {
     let date = new Date(content.data.date);
 
     if (!!content.data.link) {
-        name = "<a href='" + content.data.link + "' target='_blank'>" + name + "</a>";
+        name = "<a href=\"" + content.data.link + "\" target=\"_blank\" onclick=\"onFollowLink('" + name + "')\">" + name + "</a>";
     }
 
     return d + "r-" + x + "r-" + x + "r-" + x + "&nbsp;diego&nbsp;staff&nbsp;" + date.toLocaleDateString("es-ES", dateOptions) +  "&nbsp;" + name + "<br/>";
+}
+
+function onFollowLink(entry) {
+
+    let entries = document.querySelectorAll('input');
+    let prompt = [].slice.call(entries).pop();
+    prompt.readOnly = true;
+    prompt.onblur = null;
+    historyPointer = 0;
+    currentCommand = "";
+
+    openLink(entry);
+}
+
+function openLink(entry) {
+
+    let resultRow = getDisplay();
+    resultRow.textContent = "opening '" + entry + "' in the web browser...";
+    historyCommands.push("./" + entry);
+    showPrompt();
 }
 
 function cd(args) {
