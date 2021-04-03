@@ -9,9 +9,6 @@
 
 /**
  * TO-DO
- * - cd
- * - cd ~
- * - ls -la
  * - cd no such directory as 404 page (eg, http://diegorivera.com.es/drappstudio)
  * - su <user>
  */
@@ -36,7 +33,6 @@ document.addEventListener("keyup", async (event) => {
             prompt.readOnly = true;
             prompt.onblur = null;
             var arguments = prompt.value.replace(/^(\.\/)/,"");;
-
             var contents = await getCurentPathContents();
             for (const entry in contents.childs) {
                 if (entry.toLowerCase() == arguments.toLowerCase().trim()) {

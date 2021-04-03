@@ -10,7 +10,7 @@
 async function ls(args) {
 
     var originalPath;
-    if (args[0]) {
+    if (args[0] && args[0].trim().indexOf("-") != 0) {
         originalPath = [...currentPath];
         try {
             await changeDir(args[0]);
@@ -40,10 +40,14 @@ async function ls(args) {
 
 async function cd(args) {
 
-    try {
-        await changeDir(args[0]);
-    } catch (error) {
-        showDisplay(error);
+    if (args.length == 0 || args[0].trim() == "~") {
+        currentPath = [];        
+    } else {
+        try {
+            await changeDir(args[0]);
+        } catch (error) {
+            showDisplay(error);
+        }
     }
     showPrompt();
 }
