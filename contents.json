@@ -40,6 +40,18 @@
                 "date": "1988-10-01"
             },
             "childs": {
+                "Last.fm": {
+                    "data": {
+                        "date": "2007-06-28",
+                        "link": "https://www.last.fm/user/dievon"
+                    }
+                },
+                "Spotify": {
+                    "data": {
+                        "date": "2013-08-10",
+                        "link": "https://open.spotify.com/user/dievon"
+                    }
+                },
                 "Twitter": {
                     "data": {
                         "date": "2009-11-20",
