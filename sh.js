@@ -11,6 +11,7 @@
  * TO-DO
  * - cd no such directory as 404 page (eg, http://diegorivera.com.es/drappstudio)
  * - su <user>
+ * - autocomplete from tab
  */
 
 var currentPath = [];
@@ -19,9 +20,10 @@ var historyPointer = 0;
 var historyCommands = [];
 var currentCommand = "";
 
-window.onload = () => {
+window.onload = async () => {
 
-    showPrompt();
+    let dir = window.location.pathname.replace(/^(\/)/,"");
+    await cd(dir.length > 0 ? [dir] : []);
 }
 
 document.addEventListener("keyup", async (event) => {
