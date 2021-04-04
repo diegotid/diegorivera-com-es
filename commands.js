@@ -51,3 +51,11 @@ async function cd(args) {
     }
     showPrompt();
 }
+
+function help() {
+
+    let help = "<b>ls</b> [dir] -- list [dir] (current directory if not specified) contents<br/>"
+            + "<b>cd</b> [dir] -- change directory to [dir] (home if not specified)<br/>";
+    showDisplay(help);
+    showPrompt();
+}
