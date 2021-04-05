@@ -9,9 +9,12 @@
 
 /**
  * TO-DO
- * - cd no such directory as 404 page (eg, http://diegorivera.com.es/drappstudio)
+ * - pwd
  * - su <user>
  * - autocomplete from tab
+ * - cat/head/tail
+ * - cp/mkdir/mv/rm just showing not allowed
+ * - mail to leave comments (su mandatory)
  */
 
 var currentPath = [];
