@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "F6HFAVTS49.com.telefonica.opengateway.sandbox.MockOperator",
+        "paths": [ "/mockistar" ]
+      }
+    ]
+  },
+  "appclips": {
+    "apps": [
+      "F6HFAVTS49.com.telefonica.opengateway.sandbox.MockOperator.Clip"
+    ]
+  }
+}

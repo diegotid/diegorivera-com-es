@@ -1,0 +1,11 @@
+{
+  "routes": [
+    {
+      "route": "/apple-app-site-association",
+      "rewrite": "/apple-app-site-association.json"
+    }
+  ],
+  "mimeTypes": {
+    ".json": "application/json"
+  }
+}
