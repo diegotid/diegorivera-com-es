@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLA - Silent Login Application</title>
+    
+    <!-- Material-UI CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background-color: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo-text {
+            font-size: 72px;
+            font-weight: 700;
+            color: #4CAF50;
+            line-height: 1;
+            margin-bottom: 0;
+        }
+        
+        .app-title {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 28px;
+            font-weight: 500;
+            margin-bottom: 40px;
+            line-height: 1.3;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 18px;
+            border: 2px solid #4CAF50;
+            border-radius: 12px;
+            outline: none;
+            font-family: 'Roboto', sans-serif;
+            transition: border-color 0.3s;
+        }
+        
+        .input-field::placeholder {
+            color: #bdbdbd;
+        }
+        
+        .input-field:focus {
+            border-color: #45a049;
+        }
+        
+        .forgot-password {
+            display: block;
+            text-align: left;
+            color: #4CAF50;
+            font-size: 16px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 18px;
+            font-size: 20px;
+            font-weight: 500;
+            color: white;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Roboto', sans-serif;
+            margin-bottom: 20px;
+        }
+        
+        .login-button:hover {
+            background-color: #45a049;
+        }
+        
+        .divider {
+            text-align: center;
+            font-size: 20px;
+            color: #757575;
+            margin: 20px 0;
+        }
+        
+        .phone-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .country-code {
+            position: relative;
+            width: 100px;
+        }
+        
+        .country-code-select {
+            width: 100%;
+            padding: 16px 12px;
+            font-size: 18px;
+            border: 2px solid #4CAF50;
+            border-radius: 12px;
+            outline: none;
+            font-family: 'Roboto', sans-serif;
+            background-color: white;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+        
+        .country-code::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #4CAF50;
+            font-size: 12px;
+        }
+        
+        .phone-number {
+            flex: 1;
+        }
+        
+        .mobile-button {
+            width: 100%;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 500;
+            color: white;
+            background-color: #2196F3;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        .mobile-button:hover {
+            background-color: #1976D2;
+        }
+        
+        /* Popover styles */
+        .popover-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 0;
+        }
+        
+        .popover-overlay.active {
+            display: flex;
+        }
+        
+        .popover-content {
+            background-color: white;
+            border-radius: 20px 20px 0 0;
+            max-width: 400px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+            animation: popoverSlideUp 0.3s ease-out;
+        }
+        
+        @keyframes popoverSlideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+        
+        .popover-header {
+            background-color: #e0e0e0;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .popover-header-icon {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .popover-header-text {
+            flex: 1;
+        }
+        
+        .popover-brand {
+            font-weight: 500;
+            font-size: 18px;
+            color: #dcdcdc;
+        }
+        
+        .popover-subtitle {
+            font-size: 14px;
+            color: #424242;
+            line-height: 1.3;
+            margin-top: 2px;
+        }
+        
+        .popover-banner {
+            background: linear-gradient(135deg, #dadada 0%, #e0e0e0 100%);
+            padding: 60px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .banner-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            color: white;
+            margin-bottom: 10px;
+        }
+        
+        .banner-logo-icon {
+            width: 60px;
+            height: 60px;
+            border: 3px solid white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            font-weight: bold;
+        }
+        
+        .banner-title {
+            font-size: 42px;
+            font-weight: 500;
+            color: white;
+            line-height: 1;
+        }
+        
+        .banner-brand {
+            font-size: 24px;
+            color: white;
+            font-weight: 300;
+            margin-top: 5px;
+        }
+        
+        .popover-body {
+            background-color: #f0f0f0;
+            padding: 30px 20px;
+        }
+        
+        .popover-title {
+            font-size: 24px;
+            font-weight: 500;
+            color: #212121;
+            margin-bottom: 8px;
+        }
+        
+        .popover-description {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+        
+        .popover-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .popover-btn {
+            flex: 1;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+            transition: opacity 0.3s;
+        }
+        
+        .popover-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-safari {
+            background-color: white;
+            color: #007AFF;
+        }
+        
+        .btn-app-clip {
+            background-color: white;
+            color: #007AFF;
+        }
+        
+        .popover-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .powered-by {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .powered-logo {
+            width: 30px;
+            height: 30px;
+            background-color: #dadada;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .app-store-link {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #d1d1d1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .app-store-link:hover {
+            text-decoration: underline;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        .close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+            
+            .logo-text {
+                font-size: 60px;
+            }
+            
+            .app-title {
+                font-size: 24px;
+            }
+            
+            .popover-content {
+                margin: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1 class="logo-text">SLA</h1>
+        </div>
+        
+        <h2 class="app-title">silent login<br>application</h2>
+        
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="text" class="input-field" placeholder="Usuario" id="username" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" class="input-field" placeholder="Contraseña" id="password" required>
+            </div>
+            
+            <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+            
+            <button type="submit" class="login-button">Iniciar sesión</button>
+        </form>
+        
+        <div class="divider">ó</div>
+        
+        <div class="phone-input-container">
+            <div class="country-code">
+                <select class="country-code-select" id="countryCode">
+                    <option value="+34">+34</option>
+                    <option value="+1">+1</option>
+                    <option value="+44">+44</option>
+                    <option value="+33">+33</option>
+                    <option value="+49">+49</option>
+                    <option value="+39">+39</option>
+                    <option value="+52">+52</option>
+                    <option value="+54">+54</option>
+                </select>
+            </div>
+            <input type="tel" class="input-field phone-number" placeholder="423423234123" id="phoneNumber">
+        </div>
+        
+        <button type="button" class="mobile-button" id="mobileLoginBtn">Acceder con mi línea móvil</button>
+    </div>
+    
+    <!-- Popover Modal -->
+    <div class="popover-overlay" id="popoverOverlay">
+        <div class="popover-content">
+            
+			<img src="./mockistar-clip.png" alt="App Clip Illustration" style="width: 400px; height: auto; display: block; margin: 0;">
+            
+            <div class="popover-body">
+                <h3 class="popover-title">Identificación móvil</h3>
+                <p class="popover-description">Identifícate en tu app usando tu línea móvil...</p>
+                
+                <div class="popover-buttons">
+                    <button class="popover-btn btn-safari" id="viewInSafari">Ver en Safari</button>
+                    <button class="popover-btn btn-app-clip" id="openAppClip">Abrir App Clip</button>
+                </div>
+                
+                <div class="popover-footer">
+                    <div class="powered-by">
+                        <img src="./mockistar.png" style="width: 18px; height: 15px;"/>
+                        <span>Powered by<br><strong>Mockistar</strong></span>
+                    </div>
+                    <a href="#" class="app-store-link">
+                        <span style="filter: grayscale(1);">🍎</span> <span>App Store</span>
+                        <span>›</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            console.log('Login attempt:', { username, password });
+            alert('Iniciando sesión...');
+            // Add your login logic here
+        });
+        
+        // Handle mobile login - show popover
+        document.getElementById('mobileLoginBtn').addEventListener('click', function() {
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            
+            console.log('Mobile login attempt:', { countryCode, phoneNumber });
+            
+            // Show popover
+            document.getElementById('popoverOverlay').classList.add('active');
+        });
+        
+        // Close popover when clicking outside
+        document.getElementById('popoverOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+            }
+        });
+        
+        // Handle View in Safari button
+        document.getElementById('viewInSafari').addEventListener('click', function() {
+            console.log('View in Safari clicked');
+            document.getElementById('popoverOverlay').classList.remove('active');
+        });
+        
+        // Handle Open App Clip button
+        document.getElementById('openAppClip').addEventListener('click', function() {
+            console.log('Open App Clip clicked');
+            window.location.href = 'mockistar://ot?callback=invoker://login';
+        });
+        
+        // Handle forgot password
+        document.querySelector('.forgot-password').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Recuperar contraseña...');
+            // Add your password recovery logic here
+        });
+    </script>
+</body>
+</html>
