@@ -52,10 +52,35 @@ async function cd(args) {
     showPrompt();
 }
 
+function pwd() {
+
+    showDisplay("/" + currentPath.join("/"));
+    showPrompt();
+}
+
+async function open(args) {
+
+    if (args.length == 0 || !args[0].trim()) {
+        showDisplay("usage: open [entry]");
+        showPrompt();
+        return;
+    }
+
+    try {
+        await openEntry(args[0].trim());
+    } catch (error) {
+        showDisplay(error);
+        showPrompt();
+    }
+}
+
 function help() {
 
     let help = "<b>ls</b> [dir] -- list [dir] (current directory if not specified) contents<br/>"
-            + "<b>cd</b> [dir] -- change directory to [dir] (home if not specified)<br/>";
+            + "<b>cd</b> [dir] -- change directory to [dir] (home if not specified)<br/>"
+            + "<b>pwd</b> -- print the current working directory<br/>"
+            + "<b>open</b> [entry] -- open [entry] in the web browser<br/>"
+            + "<b>./[entry]</b> -- shortcut to open [entry] in the web browser<br/>";
     showDisplay(help);
     showPrompt();
 }

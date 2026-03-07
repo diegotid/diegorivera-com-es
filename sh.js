@@ -37,24 +37,25 @@ document.addEventListener("keyup", async (event) => {
         case 'Enter':
             prompt.readOnly = true;
             prompt.onblur = null;
-            var arguments = prompt.value.replace(/^(\.\/)/,"");;
-            var contents = await getCurentPathContents();
-            for (const entry in contents.childs) {
-                if (entry.toLowerCase() == arguments.toLowerCase().trim()) {
-                    let content = contents.childs[entry];
-                    if (!!content.data.link) {
-                        window.open(content.data.link, "_blank");
-                        openLink(entry);
-                        return;
-                    }
+            var input = prompt.value.trim();
+            if (input.indexOf("./") == 0) {
+                let requestedEntry = input.replace(/^(\.\/)/, "").trim();
+                try {
+                    await openEntry(requestedEntry);
+                } catch (error) {
+                    showDisplay(error);
+                    showPrompt();
                 }
+                historyPointer = 0;
+                currentCommand = "";
+                return;
             }
-            arguments = arguments.split(" ");
+            var arguments = input.split(" ");
             let command = arguments.shift();
             if (!command) {
                 showPrompt();
             } else if (!!window[command]) {
-                historyCommands.push(prompt.value);
+                historyCommands.push(input);
                 window[command](arguments);
             } else {
                 showDisplay("command not found: " + command);
@@ -97,6 +98,15 @@ function getCurentPathContents() {
             }
             resolve(contents);
         })
+    });
+}
+
+function getContentsTree() {
+
+    return new Promise(resolve => {
+        fetch('contents.json')
+        .then(response => response.json())
+        .then(contents => resolve(contents));
     });
 }
 
@@ -152,6 +162,69 @@ function showDisplay(content) {
     var resultRow = document.createElement('div');
     document.querySelector('#terminal').appendChild(resultRow);
     resultRow.innerHTML = content;
+}
+
+async function openEntry(requestedEntry) {
+
+    let content = await getEntryAtPath(requestedEntry);
+    if (!!content.data.link) {
+        if (!openExternalLink(content.data.link)) {
+            throw "popup blocked while opening: " + requestedEntry;
+        }
+        openLink(requestedEntry);
+        return;
+    }
+    throw "not a link: " + requestedEntry;
+}
+
+function openExternalLink(url) {
+
+    let anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.target = "_blank";
+    anchor.rel = "noopener noreferrer";
+    anchor.style.display = "none";
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+
+    return true;
+}
+
+async function getEntryAtPath(path) {
+
+    let contents = await getContentsTree();
+    let resolvedPath = path.indexOf("/") == 0 ? [] : [...currentPath];
+    let parts = path.split("/").filter(part => part.length > 0);
+
+    for (const part of parts) {
+        if (part == ".") {
+            continue;
+        }
+        if (part == "..") {
+            resolvedPath.pop();
+            continue;
+        }
+
+        let currentContents = contents;
+        for (const dir of resolvedPath) {
+            currentContents = currentContents.childs[dir];
+        }
+
+        let match = Object.keys(currentContents.childs).find(entry => entry.toLowerCase() == part.toLowerCase());
+        if (!match) {
+            throw "no such file or directory: " + path;
+        }
+
+        resolvedPath.push(match);
+    }
+
+    let result = contents;
+    for (const dir of resolvedPath) {
+        result = result.childs[dir];
+    }
+
+    return result;
 }
 
 function lsLine(name, content) {
