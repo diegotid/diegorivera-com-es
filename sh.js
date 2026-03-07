@@ -24,8 +24,13 @@ var currentCommand = "";
 
 window.onload = async () => {
 
-    let dir = window.location.pathname.replace(/^(\/)/,"");
-    await cd(dir.length > 0 ? [dir] : []);
+    let dir = decodeURIComponent(window.location.pathname).replace(/^(\/)/,"");
+    if (dir.length > 0 && dir.indexOf(".") == -1) {
+        await cd([dir], { replaceLocation: true });
+        return;
+    }
+
+    await cd([], { replaceLocation: true });
 }
 
 document.addEventListener("keydown", async (event) => {
@@ -134,6 +139,20 @@ function getContentsTree() {
 function getPath() {
 
     return user + ":~" + (currentPath.length > 0 ? "/"  : "") + currentPath.join("/");
+}
+
+function syncWindowLocation(replaceLocation) {
+
+    let path = currentPath.length > 0
+        ? "/" + currentPath.map(dir => encodeURIComponent(dir)).join("/")
+        : "/";
+
+    if (replaceLocation) {
+        window.history.replaceState(null, "", path);
+        return;
+    }
+
+    window.history.pushState(null, "", path);
 }
 
 async function changeDir(to) {

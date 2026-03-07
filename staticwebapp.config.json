@@ -5,6 +5,18 @@
       "rewrite": "/apple-app-site-association.json"
     }
   ],
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/*.css",
+      "/*.html",
+      "/*.js",
+      "/*.json",
+      "/*.png",
+      "/mockistar",
+      "/mockistar/*"
+    ]
+  },
   "mimeTypes": {
     ".json": "application/json"
   }

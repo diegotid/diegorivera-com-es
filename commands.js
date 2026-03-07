@@ -38,13 +38,22 @@ async function ls(args) {
     showPrompt();
 }
 
-async function cd(args) {
+async function cd(args, options = {}) {
+
+    let updateLocation = options.updateLocation !== false;
+    let replaceLocation = options.replaceLocation === true;
 
     if (args.length == 0 || args[0].trim() == "~") {
-        currentPath = [];        
+        currentPath = [];
+        if (updateLocation) {
+            syncWindowLocation(replaceLocation);
+        }
     } else {
         try {
             await changeDir(args[0]);
+            if (updateLocation) {
+                syncWindowLocation(replaceLocation);
+            }
         } catch (error) {
             showDisplay(error);
         }
