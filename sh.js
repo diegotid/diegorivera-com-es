@@ -11,7 +11,6 @@
  * TO-DO
  * - pwd
  * - su <user>
- * - autocomplete from tab
  * - cat/head/tail
  * - cp/mkdir/mv/rm just showing not allowed
  * - mail to leave comments (su mandatory)
@@ -28,6 +27,28 @@ window.onload = async () => {
     let dir = window.location.pathname.replace(/^(\/)/,"");
     await cd(dir.length > 0 ? [dir] : []);
 }
+
+document.addEventListener("keydown", async (event) => {
+
+    if (event.key != 'Tab') {
+        return;
+    }
+
+    let entries = document.querySelectorAll('input');
+    let prompt = [].slice.call(entries).pop();
+    if (!prompt || prompt.readOnly) {
+        return;
+    }
+
+    event.preventDefault();
+
+    let completed = await autocompleteInput(prompt.value);
+    if (!!completed && completed != prompt.value) {
+        prompt.value = completed;
+        currentCommand = prompt.value;
+        prompt.setSelectionRange(prompt.value.length, prompt.value.length);
+    }
+});
 
 document.addEventListener("keyup", async (event) => {
 
@@ -117,8 +138,12 @@ function getPath() {
 
 async function changeDir(to) {
 
+    if (to.indexOf("/") == 0) {
+        currentPath = [];
+    }
+
     var contents = await getCurentPathContents();
-    let path = to.split("/");
+    let path = to.split("/").filter(part => part.length > 0);
     for (const i in path) {
         let dir = path[i];
         if (dir != '.') {
@@ -164,6 +189,107 @@ function showDisplay(content) {
     resultRow.innerHTML = content;
 }
 
+async function autocompleteInput(input) {
+
+    if (!input || input.trim().length == 0) {
+        return input;
+    }
+
+    if (input.indexOf("./") == 0) {
+        return await autocompletePathInput("./", input.substring(2));
+    }
+
+    let parts = input.split(" ");
+    if (parts.length == 1 && input[input.length - 1] != " ") {
+        return autocompleteCommand(parts[0]);
+    }
+
+    let command = parts.shift();
+    if (command == "cd" || command == "open") {
+        let hasTrailingSpace = input[input.length - 1] == " ";
+        let pathInput = parts.join(" ");
+        if (hasTrailingSpace) {
+            pathInput += " ";
+        }
+        return command + " " + await autocompletePath(pathInput);
+    }
+
+    return input;
+}
+
+function autocompleteCommand(commandInput) {
+
+    let commands = ["help", "ls", "cd", "pwd", "open"];
+    let matches = commands.filter(command => command.indexOf(commandInput.toLowerCase()) == 0);
+    if (matches.length == 0) {
+        return commandInput;
+    }
+    if (matches.length == 1) {
+        return matches[0] + " ";
+    }
+
+    return getLongestCommonPrefix(matches, commandInput);
+}
+
+async function autocompletePathInput(prefix, pathInput) {
+
+    return prefix + await autocompletePath(pathInput);
+}
+
+async function autocompletePath(pathInput) {
+
+    let originalInput = pathInput;
+    let normalizedInput = pathInput.trim();
+    let endsWithSlash = normalizedInput.length > 0 && normalizedInput[normalizedInput.length - 1] == "/";
+    let pathParts = normalizedInput.split("/").filter(part => part.length > 0);
+    let searchTerm = endsWithSlash ? "" : (pathParts.pop() || "");
+    let baseParts = normalizedInput.indexOf("/") == 0 ? [] : [...currentPath];
+
+    try {
+        for (const part of pathParts) {
+            if (part == ".") {
+                continue;
+            }
+            if (part == "..") {
+                baseParts.pop();
+                continue;
+            }
+            let match = await findMatchingEntry(baseParts, part);
+            if (!match || !match.content.childs) {
+                return originalInput;
+            }
+            baseParts.push(match.name);
+        }
+
+        let matches = await listMatchingEntries(baseParts, searchTerm);
+        if (matches.length == 0) {
+            return originalInput;
+        }
+
+        let completedName = matches.length == 1
+            ? matches[0].name + (matches[0].content.childs ? "/" : "")
+            : getLongestCommonPrefix(matches.map(match => match.name), searchTerm);
+
+        let prefix = normalizedInput.indexOf("/") == 0 ? "/" : "";
+        let completedParts = [...pathParts];
+        if (completedName.length > 0) {
+            completedParts.push(completedName);
+        }
+
+        let completedPath = prefix + completedParts.join("/");
+        if (normalizedInput == "" && matches.length == 1 && matches[0].content.childs) {
+            return completedName;
+        }
+        if (completedPath.length == 0 && originalInput.indexOf("/") == 0) {
+            return "/";
+        }
+
+        return completedPath;
+    } catch (error) {
+        return originalInput;
+    }
+}
+
 async function openEntry(requestedEntry) {
 
     let content = await getEntryAtPath(requestedEntry);
@@ -189,6 +315,24 @@ function openExternalLink(url) {
     document.body.removeChild(anchor);
 
     return true;
+}
+
+async function listMatchingEntries(baseParts, searchTerm) {
+
+    let contents = await getContentsTree();
+    for (const dir of baseParts) {
+        contents = contents.childs[dir];
+    }
+
+    return Object.keys(contents.childs)
+        .filter(entry => entry.toLowerCase().indexOf(searchTerm.toLowerCase()) == 0)
+        .map(entry => ({ name: entry, content: contents.childs[entry] }));
+}
+
+async function findMatchingEntry(baseParts, entryName) {
+
+    let matches = await listMatchingEntries(baseParts, entryName);
+    return matches.find(match => match.name.toLowerCase() == entryName.toLowerCase());
 }
 
 async function getEntryAtPath(path) {
@@ -225,6 +369,22 @@ async function getEntryAtPath(path) {
     }
 
     return result;
+}
+
+function getLongestCommonPrefix(values, fallback) {
+
+    if (values.length == 0) {
+        return fallback;
+    }
+
+    let prefix = values[0];
+    for (const value of values.slice(1)) {
+        while (value.toLowerCase().indexOf(prefix.toLowerCase()) != 0 && prefix.length > 0) {
+            prefix = prefix.substring(0, prefix.length - 1);
+        }
+    }
+
+    return prefix.length >= fallback.length ? prefix : fallback;
 }
 
 function lsLine(name, content) {
