@@ -205,7 +205,7 @@ async function autocompleteInput(input) {
     }
 
     let command = parts.shift();
-    if (command == "cd" || command == "open") {
+    if (command == "cd" || command == "open" || command == "ls") {
         let hasTrailingSpace = input[input.length - 1] == " ";
         let pathInput = parts.join(" ");
         if (hasTrailingSpace) {
@@ -387,9 +387,15 @@ function getLongestCommonPrefix(values, fallback) {
     return prefix.length >= fallback.length ? prefix : fallback;
 }
 
-function lsLine(name, content) {
+function formatShortDate(date) {
 
-    let dateOptions = { year: 'numeric', month: 'short', day: '2-digit' };
+    const months = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+    let day = String(date.getDate()).padStart(2, "0");
+
+    return day + " " + months[date.getMonth()] + " " + date.getFullYear();
+}
+
+function lsLine(name, content) {
 
     let d = !!content.childs ? "d" : "-";
     let x = !!content.data.link || !!content.childs ? "x" : "-";
@@ -399,7 +405,7 @@ function lsLine(name, content) {
         name = "<a href=\"" + content.data.link + "\" target=\"_blank\" onclick=\"onFollowLink('" + name + "')\">" + name + "</a>";
     }
 
-    return d + "r-" + x + "r-" + x + "r-" + x + "&nbsp;diego&nbsp;staff&nbsp;" + date.toLocaleDateString("es-ES", dateOptions) +  "&nbsp;" + name + "<br/>";
+    return d + "r-" + x + "r-" + x + "r-" + x + "&nbsp;diego&nbsp;staff&nbsp;" + formatShortDate(date) +  "&nbsp;" + name + "<br/>";
 }
 
 function onFollowLink(entry) {

@@ -32,6 +32,12 @@
                         "date": "2011-07-19",
                         "link": "https://github.com/diegotid"
                     }                
+                },
+                "cuatro.studio": {
+                    "data": {
+                        "date": "2019-05-26",
+                        "link": "http://cuatro.studio"
+                    }
                 }
             }
         },
@@ -40,22 +46,35 @@
                 "date": "1988-10-01"
             },
             "childs": {
+                "archive": {
+                    "data": {
+                        "date": "2009-11-20"
+                    },
+                    "childs": {
+                        "Spotify": {
+                            "data": {
+                                "date": "2013-08-10",
+                                "link": "https://open.spotify.com/user/dievon"
+                            }
+                        },
+                        "Twitter": {
+                            "data": {
+                                "date": "2009-11-20",
+                                "link": "http://twitter.com/notthefamous"
+                            }
+                        }
+                    }
+                },
                 "Last.fm": {
                     "data": {
                         "date": "2007-06-28",
-                        "link": "https://www.last.fm/user/dievon"
+                        "link": "https://www.last.fm/user/dievon/library/artists"
                     }
                 },
-                "Spotify": {
+                "Reddit": {
                     "data": {
-                        "date": "2013-08-10",
-                        "link": "https://open.spotify.com/user/dievon"
-                    }
-                },
-                "Twitter": {
-                    "data": {
-                        "date": "2009-11-20",
-                        "link": "http://twitter.com/notthefamous"
+                        "date": "2025-09-12",
+                        "link": "https://www.reddit.com/user/Diego-Rivera-Madrid/"
                     }
                 }
             }
