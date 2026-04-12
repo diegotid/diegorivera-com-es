@@ -65,6 +65,12 @@
                         }
                     }
                 },
+                "Setlist.fm": {
+                    "data": {
+                        "date": "1997-08-09",
+                        "link": "https://www.setlist.fm/concerts/dievon"
+                    }
+                },
                 "Last.fm": {
                     "data": {
                         "date": "2007-06-28",
